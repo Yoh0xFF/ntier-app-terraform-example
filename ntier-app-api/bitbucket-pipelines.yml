@@ -1,0 +1,16 @@
+image:
+  name: ioram/ntier-build-runner:latest
+  username: $DOCKER_HUB_USERNAME
+  password: $DOCKER_HUB_PASSWORD
+
+pipelines:
+  branches:
+    master:
+      - step:
+          script:
+            - pwd
+            - packer --version
+            - terraform --version
+            - packer build /deploy/ami/builder.json
+            - terraform init -backend-config="key=ntier-arch-deploy-api/state.tfstate" -backend-config="dynamodb_table=terraform-ntier-arch-deploy-api" /deploy
+            - terraform apply -auto-approve /deploy

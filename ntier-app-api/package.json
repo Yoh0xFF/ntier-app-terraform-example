@@ -1,0 +1,30 @@
+{
+    "name": "ntier-app-boot",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "watch": "nodemon --exec babel-node --presets env src/index.js",
+        "build": "babel src --out-dir dist --copy-files",
+        "serve": "npm run build && node dist/index.js"
+    },
+    "dependencies": {
+        "axios": "^0.18.0",
+        "cookie-parser": "~1.4.3",
+        "debug": "~2.6.9",
+        "express": "~4.16.0",
+        "hbs": "~4.0.1",
+        "http-errors": "~1.6.2",
+        "morgan": "~1.9.0",
+        "mysql2": "^1.6.4",
+        "sequelize": "^4.42.0"
+    },
+    "devDependencies": {
+        "babel-cli": "^6.26.0",
+        "babel-core": "^6.26.3",
+        "babel-loader": "^8.0.4",
+        "babel-polyfill": "^6.26.0",
+        "babel-preset-env": "^1.7.0",
+        "copyfiles": "^2.1.0",
+        "nodemon": "^1.18.9"
+    }
+}

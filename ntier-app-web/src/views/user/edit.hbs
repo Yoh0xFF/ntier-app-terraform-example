@@ -1,0 +1,13 @@
+<div class="user-edit-form">
+    <h1>{{title}}</h1>
+
+    <form action="/user" method="post">
+        <input type="hidden" name="id" value="{{user.id}}">
+
+        <input type="email" required="true" placeholder="Enter E-Mail..." name="email" value="{{user.email}}" />
+        <input type="text" required="true" placeholder="Enter Name..." name="fullName" value="{{user.fullName}}" />
+
+        <br/>
+        <input type="submit" name="Submit" value="Submit"/>
+    </form>
+</div>

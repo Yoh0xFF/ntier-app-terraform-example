@@ -1,0 +1,5 @@
+apps:
+  - script   : ./dist/index.js
+    name     : 'ntier-app-api'
+    instances: 2
+    exec_mode: cluster

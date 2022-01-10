@@ -1,0 +1,72 @@
+{
+    "variables": {
+        "aws_access_key_id": "{{env `AWS_ACCESS_KEY_ID`}}",
+        "aws_secret_access_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+        "aws_default_region": "{{env `AWS_DEFAULT_REGION`}}",
+        "app_name": "{{env `TF_VAR_app_name`}}",
+        "ntier_api_url": "{{env `NTIER_API_URL`}}",
+        "ntier_db_host": "{{env `NTIER_DB_HOST`}}",
+        "ntier_db_schema": "{{env `NTIER_DB_SCHEMA`}}",
+        "ntier_db_username": "{{env `NTIER_DB_USERNAME`}}",
+        "ntier_db_password": "{{env `NTIER_DB_PASSWORD`}}"
+    },
+
+    "sensitive-variables": ["aws_access_key", "aws_secret_key"],
+
+    "builders": [
+        {
+            "ami_name": "{{user `app_name`}}-{{timestamp}}",
+            "type": "amazon-ebs",
+            "instance_type": "t2.micro",
+
+            "access_key": "{{user `aws_access_key_id`}}",
+            "secret_key": "{{user `aws_secret_access_key`}}",
+            "region": "{{user `aws_default_region`}}",
+
+            "source_ami_filter": {
+                "filters": {
+                    "name": "ami-ubuntu-18.04-*",
+                    "virtualization-type": "hvm",
+                    "root-device-type": "ebs"
+                },
+
+                "owners": [
+                    "258751437250"
+                ],
+
+                "most_recent": true
+            },
+
+            "ssh_username": "ubuntu"
+        }
+    ],
+
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline": [ "mkdir ~/{{user `app_name`}}" ]
+        },
+        {
+            "type": "file",
+            "source": "{{pwd}}/",
+            "destination": "~/{{user `app_name`}}"
+        },
+        {
+            "type": "shell",
+            "script": "{{template_dir}}/install_app.sh",
+            "environment_vars": [
+                "APP_NAME={{user `app_name`}}",
+                "NTIER_API_URL={{user `ntier_api_url`}}",
+                "NTIER_DB_HOST={{user `ntier_db_host`}}",
+                "NTIER_DB_SCHEMA={{user `ntier_db_schema`}}",
+                "NTIER_DB_USERNAME={{user `ntier_db_username`}}",
+                "NTIER_DB_PASSWORD={{user `ntier_db_password`}}"
+            ]
+        },
+        {
+            "type": "shell",
+            "script": "{{template_dir}}/install_cloudwatch_agent.sh",
+            "environment_vars": ["APP_NAME={{user `app_name`}}"]
+        }
+    ]
+}

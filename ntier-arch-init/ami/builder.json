@@ -1,0 +1,65 @@
+{
+    "variables": {
+        "aws_access_key_id": "{{env `AWS_ACCESS_KEY_ID`}}",
+        "aws_secret_access_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+        "aws_default_region": "{{env `AWS_DEFAULT_REGION`}}",
+        "app_name": "{{env `APP_NAME`}}"
+    },
+
+    "builders": [
+        {
+            "ami_name": "ntier-app-{{timestamp}}",
+            "type": "amazon-ebs",
+            "instance_type": "t2.micro",
+
+            "access_key": "{{user `aws_access_key_id`}}",
+            "secret_key": "{{user `aws_secret_access_key`}}",
+            "region": "{{user `aws_default_region`}}",
+
+            "source_ami_filter": {
+                "filters": {
+                    "name": "ami-ubuntu-18.04-*",
+                    "virtualization-type": "hvm",
+                    "root-device-type": "ebs"
+                },
+
+                "owners": [
+                    "258751437250"
+                ],
+
+                "most_recent": true
+            },
+
+            "ssh_username": "ubuntu"
+        }
+    ],
+
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline": [
+                "sleep 60",
+                "sudo apt-get update",
+                "sudo apt-get upgrade -y",
+
+                "curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -",
+                "sudo apt-get install -y nodejs",
+                "sudo apt-get install -y gcc g++ make",
+                "sudo npm install npm@latest -g",
+                "sudo npm install pm2 -g",
+
+                "sudo apt-get install -y git",
+                "git clone https://ioram@bitbucket.org/ioram/ntier-app-boot.git",
+
+                "cd ./ntier-app-boot/",
+                "npm install",
+                "npm run build",
+                "pm2 start dist/index.js",
+                "pm2 save",
+                "cd ../",
+
+                "sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup ubuntu -u ubuntu --hp /home/ubuntu"
+            ]
+        }
+    ]
+}
